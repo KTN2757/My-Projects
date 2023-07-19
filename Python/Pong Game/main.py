@@ -10,14 +10,40 @@ w, h = 800, 600
 window = py.display.set_mode((800, 600))
 running = True
 py.display.set_caption("Pong Game")
-window.fill((0, 0, 0))
 
-line1 = py.draw.line(window, (255, 255, 255), (5, h//2), (5, h//2+50), 12)
-line2 = py.draw.line(window, (255, 255, 255), (793, h//2), (793, h//2+50), 12)
+# Rackets and Ball
+white = (255, 255, 255)
+def draw_racket1(x1, y1, x2, y2):
+    racket1 = py.draw.line(window, white, (x1, y1), (x2, y2), 12)
+def draw_racket2(x1, y1, x2, y2):
+    racket2 = py.draw.line(window, white, (x1, y1), (x2, y2), 12)
+
+# Movement
+def draw_ball(x, y):
+    py.draw.circle(window, white, (x, y), 7)
 
 # Game Loop
+racket1StartX, racket1StartY=5, h//2
+racket1EndX, racket1EndY=5, h//2+50
+
+racket2StartX, racket2StartY=793, h//2
+racket2EndX, racket2EndY=793, h//2+50
+
+ballX=w//2
+ballY=h//2
 while running:
     for event in py.event.get():
         if event.type == py.QUIT:
             running = False
+        if event.type == py.KEYDOWN:
+            if event.key == pygame.K_UP:
+                pass
+            if event.key == pygame.K_DOWN:
+                pass
+    window.fill((0, 0, 0))
+    draw_ball(ballX, ballY)
+    draw_racket1(racket1StartX, racket1StartY, racket1EndX, racket1EndY)
+    draw_racket2(racket2StartX, racket2StartY, racket2EndX, racket2EndY)
+    ballX+=1
+    ballY+=1    
     py.display.update()
