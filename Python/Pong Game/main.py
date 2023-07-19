@@ -36,9 +36,11 @@ while running:
         if event.type == py.QUIT:
             running = False
         if event.type == py.KEYDOWN:
-            if event.key == pygame.K_UP:
+            if event.key == py.K_SPACE:
                 pass
-            if event.key == pygame.K_DOWN:
+            if event.key == py.K_UP:
+                pass
+            if event.key == py.K_DOWN:
                 pass
     window.fill((0, 0, 0))
     draw_ball(ballX, ballY)
