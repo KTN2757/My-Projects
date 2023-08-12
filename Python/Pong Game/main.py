@@ -26,7 +26,7 @@ def racket2MoveUp():
     racket2StartY+=10
     racket2EndY+=10
 def racket2MoveUp():
-    racket2StartY-=10
+    racket2StartY -= 10
     racket2EndY-=10
 
 # Game Loop
