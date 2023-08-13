@@ -36,8 +36,8 @@ racket1EndX, racket1EndY=5, h//2+50
 racket2StartX, racket2StartY=793, h//2
 racket2EndX, racket2EndY=793, h//2+50
 
-ballX=w//2
-ballY=h//2
+ballX = w//2
+ballY = h//2
 while running:
     for event in py.event.get():
         if event.type == py.QUIT:
