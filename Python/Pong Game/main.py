@@ -14,30 +14,40 @@ py.display.set_caption("Pong Game")
 
 # Rackets and Ball
 white = (255, 255, 255)
+
+
 def draw_racket1(x1, y1, x2, y2):
     racket1 = py.draw.line(window, white, (x1, y1), (x2, y2), 12)
+
+
 def draw_racket2(x1, y1, x2, y2):
     racket2 = py.draw.line(window, white, (x1, y1), (x2, y2), 12)
+
+
 def draw_ball(x, y):
     py.draw.circle(window, white, (x, y), 7)
+
 
 # Movement
 def racket2MoveUp():
     racket2StartY += 10
     racket2EndY += 10
+
+
 def racket2MoveUp():
     racket2StartY -= 10
     racket2EndY -= 10
 
+
 # Game Loop
-racket1StartX, racket1StartY=5, h//2
-racket1EndX, racket1EndY=5, h//2+50
+racket1StartX, racket1StartY = 5, h // 2
+racket1EndX, racket1EndY = 5, h // 2 + 50
 
-racket2StartX, racket2StartY=793, h//2
-racket2EndX, racket2EndY=793, h//2+50
+racket2StartX, racket2StartY = 793, h // 2
+racket2EndX, racket2EndY = 793, h // 2 + 50
 
-ballX = w//2
-ballY = h//2
+ballX = w // 2
+ballY = h // 2
 while running:
     for event in py.event.get():
         if event.type == py.QUIT:
@@ -46,13 +56,13 @@ while running:
             if event.key == py.K_SPACE:
                 pass
             if event.key == py.K_UP:
-                racket2MoveUp() 
+                racket2MoveUp()
             if event.key == py.K_DOWN:
-                racket_move_up()               
+                racket_move_up()
     window.fill((0, 0, 0))
     draw_ball(ballX, ballY)
     draw_racket1(racket1StartX, racket1StartY, racket1EndX, racket1EndY)
     draw_racket2(racket2StartX, racket2StartY, racket2EndX, racket2EndY)
-    ballX+=1
-    ballY+=1
+    ballX += 1
+    ballY += 1
     py.display.update()
