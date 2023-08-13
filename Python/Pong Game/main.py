@@ -23,11 +23,11 @@ def draw_ball(x, y):
 
 # Movement
 def racket2MoveUp():
-    racket2StartY+=10
-    racket2EndY+=10
+    racket2StartY += 10
+    racket2EndY += 10
 def racket2MoveUp():
     racket2StartY -= 10
-    racket2EndY-=10
+    racket2EndY -= 10
 
 # Game Loop
 racket1StartX, racket1StartY=5, h//2
