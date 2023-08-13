@@ -39,7 +39,6 @@ def racket2MoveUp():
     racket2EndY -= 10
 
 
-# Game Loop
 racket1StartX, racket1StartY = 5, h // 2
 racket1EndX, racket1EndY = 5, h // 2 + 50
 
@@ -48,6 +47,17 @@ racket2EndX, racket2EndY = 793, h // 2 + 50
 
 ballX = w // 2
 ballY = h // 2
+
+ballXSpeed = 0.5
+ballYSpeed = 0.5
+
+
+# Collision
+def isCollision():
+    pass
+
+
+# Game Loop
 while running:
     for event in py.event.get():
         if event.type == py.QUIT:
@@ -59,10 +69,18 @@ while running:
                 racket2MoveUp()
             if event.key == py.K_DOWN:
                 racket_move_up()
+    if ballX <= 0:
+        ballX = 0
+    if ballX >= w:
+        ballX = w
+    if ballY <= 0:
+        ballY = 0
+    if ballY >= h:
+        ballY = h
     window.fill((0, 0, 0))
     draw_ball(ballX, ballY)
     draw_racket1(racket1StartX, racket1StartY, racket1EndX, racket1EndY)
     draw_racket2(racket2StartX, racket2StartY, racket2EndX, racket2EndY)
-    ballX += 1
-    ballY += 1
+    ballX += ballXSpeed
+    # time.sleep(0.5)
     py.display.update()
