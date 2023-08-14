@@ -2,6 +2,7 @@
 import random
 import pygame as py
 import time
+import numpy as np
 
 # Initializing pygame
 py.init()
@@ -51,9 +52,15 @@ ballY = h // 2
 ballXSpeed = 0.5
 ballYSpeed = 0.5
 
+# Vectors
+racket1Vector = [racket1EndX - racket1StartX, racket1EndY - racket1EndY]
+racket2Vector = [racket2EndX - racket2StartX, racket2EndY - racket2EndY]
+np.array(racket1Vector)
+np.array(racket2Vector)
+
 
 # Collision
-def isCollision():
+def isCollision(racket1Vector[0], racket1Vector[1], racket2Vector[0], racket2Vector[1], ballX, ballY):
     pass
 
 
