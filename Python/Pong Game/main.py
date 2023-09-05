@@ -90,8 +90,6 @@ while running:
                 racket2MoveUp(racket2X, racket2Y)
             if event.key == py.K_DOWN:
                 pass
-    if ball.isCollidedWith(racket1):
-        print("asdadi")
 
     window.fill((0, 0, 0))
     draw_ball(ballX, ballY)
