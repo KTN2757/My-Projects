@@ -12,6 +12,7 @@ w, h = 800, 600
 window = py.display.set_mode((800, 600))
 running = True
 py.display.set_caption("Pong Game")
+gameOverFont = py.font.SysFont("Comic Sans MS.ttf", 64)
 
 # Rackets and Ball
 white = (255, 255, 255)
@@ -55,14 +56,6 @@ def racket2MoveDown():
     racket2EndY -= 10
 
 
-def ballAnimation():
-    global ballXSpeed, ballYSpeed
-    if ballX <= 0 or ballX >= w:
-        ballXSpeed *= -1
-    if ballY <= 0 or ballY >= h:
-        ballYSpeed *= -1
-
-
 # Vectors
 # racket1Vector = [racket1EndX - racket1StartX, racket1EndY - racket1EndY]
 # racket2Vector = [racket2EndX - racket2StartX, racket2EndY - racket2EndY]
@@ -71,11 +64,15 @@ def ballAnimation():
 
 
 # Collision
-def isCollidedWith(self, racket1):
-    return self.rect.colliderect(racket1.rect)
 
 
 # Game Over
+def ballAnimation(x, y):
+    if ballX <= 0 or ballX >= w or ballY <= 0 or ballY >= h:
+        x = 1000
+        y = 1000
+        text = gameOverFont.render("GAME OVER", True, (255, 255, 255))
+        window.blit(text, (w // 2 - 150, h // 2))
 
 
 # Game Loop
@@ -95,7 +92,7 @@ while running:
     draw_ball(ballX, ballY)
     draw_racket1(racket1X, racket1Y)
     draw_racket2(racket2X, racket2Y)
-    ballAnimation()
+    ballAnimation(ballX, ballY)
     ballX += ballXSpeed
     ballY += ballYSpeed
     # time.sleep(0.5)
