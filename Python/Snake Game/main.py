@@ -43,8 +43,8 @@ def food(x, y):
 
 
 # Collision
-def isCollision(sX, sY, fX, fY):
-    distance = math.sqrt((math.pow(fX - sX, 2)) + (math.pow(fY - sY, 2)))
+def isCollision(x1, y1, x2, y2):
+    distance = math.sqrt((math.pow(x2 - x1, 2)) + (math.pow(y2 - y1, 2)))
     if distance < 31:
         return True
     else:
@@ -123,8 +123,8 @@ while running:
 
     # Calling Collision and Growing Snake
 
-    collision = isCollision(Snake.x, Snake.y, Food.x, Food.y)
-    if collision:
+    foodCollision = isCollision(Snake.x, Snake.y, Food.x, Food.y)
+    if foodCollision:
         score += 1
         scoreText = scoreFont.render(f"Score: {score}", True, (255, 255, 255))
         Food.x = ((random.randint(32, w - 32)) // 32) * 32
@@ -139,8 +139,21 @@ while running:
         newSnakeY = Snake.y
         for i in range(1, score + 1):
             newSnakeX = ((Snake.x - Snake.w * i) // 32) * 32
+            if Snake.yChange == 0 and Snake.xChange == 32:
+                # Right
+                pass
+            if Snake.yChange == 0 and Snake.xChange == -32:
+                # Left
+                newSnakeX += 64 * i
+            if Snake.xChange == 0 and Snake.yChange == -32:
+                # Up
+                newSnakeX += 32 * i
+                newSnakeY += 32
+            if Snake.xChange == 0 and Snake.yChange == 32:
+                # Down
+                newSnakeX += 32 * i
+                newSnakeY -= 32
             snake(newSnakeX, newSnakeY, Snake.color)
-            print("abc")
         print(newSnakeX, newSnakeY)
     window.blit(scoreText, (0, 0))
 
