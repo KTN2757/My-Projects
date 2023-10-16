@@ -21,8 +21,8 @@ class Snake:
     yChange = 0
     w = 32
     h = 32
-    x = (400//w)*w
-    y = (300//h)*h
+    x = (400 // w) * w
+    y = (300 // h) * h
 
 
 def snake(x, y, color):
@@ -34,8 +34,8 @@ foodImg = pygame.image.load("apple.png")
 
 
 class Food:
-    x = ((random.randint(32, w-32))//32)*32
-    y = ((random.randint(32, h-32))//32)*32
+    x = ((random.randint(32, w - 32)) // 32) * 32
+    y = ((random.randint(32, h - 32)) // 32) * 32
 
 
 def food(x, y):
@@ -44,7 +44,7 @@ def food(x, y):
 
 # Collision
 def isCollision(sX, sY, fX, fY):
-    distance = math.sqrt((math.pow(fX-sX, 2)) + (math.pow(fY-sY, 2)))
+    distance = math.sqrt((math.pow(fX - sX, 2)) + (math.pow(fY - sY, 2)))
     if distance < 31:
         return True
     else:
@@ -72,11 +72,14 @@ restartFont = pygame.font.Font("freesansbold.ttf", 16)
 
 def restart():
     restartText = restartFont.render(
-        "Press 'r' to restart the game or 'q' to quit the game.", True, (255, 255, 255))
+        "Press 'r' to restart the game or 'q' to quit the game.", True, (255, 255, 255)
+    )
     window.blit(restartText, (200, 350))
 
 
-a = 3
+# a = 3
+dumbScoreList = []
+smartScoreList = []
 
 running = True
 # Game Loop
@@ -100,10 +103,9 @@ while running:
                 Snake.yChange = 32
             if event.key == pygame.K_r:
                 score = 0
-                scoreText = scoreFont.render(
-                    f"Score: {score}", True, (255, 255, 255))
-                Snake.x = ((400)//32)*32
-                Snake.y = ((300)//32)*32
+                scoreText = scoreFont.render(f"Score: {score}", True, (255, 255, 255))
+                Snake.x = ((400) // 32) * 32
+                Snake.y = ((300) // 32) * 32
                 snake(Snake.x, Snake.y, Snake.color)
             if event.key == pygame.K_q:
                 running = False
@@ -120,29 +122,36 @@ while running:
     snake(Snake.x, Snake.y, (255, 0, 0))
 
     # Calling Collision and Growing Snake
-    newSnakeX = ((Snake.x - Snake.w)//32)*32
-    newSnakeY = Snake.y
+
     collision = isCollision(Snake.x, Snake.y, Food.x, Food.y)
     if collision:
         score += 1
         scoreText = scoreFont.render(f"Score: {score}", True, (255, 255, 255))
-        Food.x = ((random.randint(32, w-32))//32)*32
-        Food.y = ((random.randint(32, h-32))//32)*32
-        print(newSnakeX, newSnakeY)
+        Food.x = ((random.randint(32, w - 32)) // 32) * 32
+        Food.y = ((random.randint(32, h - 32)) // 32) * 32
+
     if score >= 1:
-        scorelist = [score]
-        print(scorelist)
-        snake(newSnakeX, newSnakeY, Snake.color)
+        dumbScoreList.append(score)
+        for i in dumbScoreList:
+            if i not in smartScoreList:
+                smartScoreList.append(i)
+        print(smartScoreList)
+        newSnakeY = Snake.y
+        for i in range(1, score + 1):
+            newSnakeX = ((Snake.x - Snake.w * i) // 32) * 32
+            snake(newSnakeX, newSnakeY, Snake.color)
+            print("abc")
+        print(newSnakeX, newSnakeY)
     window.blit(scoreText, (0, 0))
 
     # Border
     if Snake.x <= 0:
         gameOver()
-    elif Snake.x >= (w-Snake.w):
+    elif Snake.x >= (w - Snake.w):
         gameOver()
     if Snake.y <= 0:
         gameOver()
-    elif Snake.y >= (h-Snake.h):
+    elif Snake.y >= (h - Snake.h):
         gameOver()
 
     # Restart The Game
