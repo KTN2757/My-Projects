@@ -19,14 +19,14 @@ restartFont = py.font.SysFont("Comic Sans MS.ttf", 32)
 white = (255, 255, 255)
 
 
-def draw_racket1(x1, y1):
+def draw_racket1(x1, y1, x2, y2):
     global racket1
-    racket1 = py.draw.rect(window, white, (x1, y1, 10, 50))
+    racket1 = py.draw.rect(window, white, (x1, y1, x2, y2))
 
 
-def draw_racket2(x1, y1):
+def draw_racket2(x1, y1, x2, y2):
     global racket2
-    racket2 = py.draw.rect(window, white, (x1, y1, 10, 50))
+    racket2 = py.draw.rect(window, white, (x1, y1, x2, y2))
 
 
 def draw_ball(x, y):
@@ -35,21 +35,21 @@ def draw_ball(x, y):
 
 
 # Movement & Animation
-racket1X, racket1Y = 5, h // 2
+racket1X1, racket1Y1 = 5, h // 2
+racket1X2, racket1Y2 = 10, 50
 
-racket2X, racket2Y = 785, h // 2
+racket2X1, racket2Y1 = 785, h // 2
+racket2X2, racket2Y2 = 10, 50
 
 ballX = w // 2
 ballY = h // 2
 
-ballXSpeed = 0.5
-ballYSpeed = 0.5
+ballXSpeed = 0
+ballYSpeed = 0
 
 
-def racket2MoveUp(x1, y1):
-    racket2Y = 2000
-    print(racket2Y)
-    return y1
+def racket2MoveUp(x1, y1, x2, y2):
+    pass
 
 
 def racket2MoveDown():
@@ -84,7 +84,7 @@ while running:
             if event.key == py.K_SPACE:
                 pass
             if event.key == py.K_UP:
-                racket2MoveUp(racket2X, racket2Y)
+                racket2MoveUp(racket2X1, racket2Y1, racket2X2, racket2Y2)
             if event.key == py.K_DOWN:
                 pass
             if gameIsOver == True and event.key == py.K_r:
@@ -95,9 +95,8 @@ while running:
 
     window.fill((0, 0, 0))
     draw_ball(ballX, ballY)
-    draw_racket1(racket1X, racket1Y)
-    draw_racket2(racket2X, racket2Y)
-    ballAnimation(ballX, ballY)
+    draw_racket1(racket1X1, racket1Y1, racket1X2, racket1Y2)
+    draw_racket2(racket2X1, racket2Y1, racket2X2, racket2Y2)
     ballX += ballXSpeed
     ballY += ballYSpeed
     if ballX <= 0 or ballX >= w or ballY <= 0 or ballY >= h:
