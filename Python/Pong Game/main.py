@@ -13,6 +13,7 @@ window = py.display.set_mode((800, 600))
 running = True
 py.display.set_caption("Pong Game")
 gameOverFont = py.font.SysFont("Comic Sans MS.ttf", 64)
+restartFont = py.font.SysFont("Comic Sans MS.ttf", 32)
 
 # Rackets and Ball
 white = (255, 255, 255)
@@ -56,23 +57,22 @@ def racket2MoveDown():
     racket2EndY -= 10
 
 
-# Vectors
-# racket1Vector = [racket1EndX - racket1StartX, racket1EndY - racket1EndY]
-# racket2Vector = [racket2EndX - racket2StartX, racket2EndY - racket2EndY]
-# np.array(racket1Vector)
-# np.array(racket2Vector)
-
-
 # Collision
 
 
 # Game Over
-def ballAnimation(x, y):
-    if ballX <= 0 or ballX >= w or ballY <= 0 or ballY >= h:
-        x = 1000
-        y = 1000
-        text = gameOverFont.render("GAME OVER", True, (255, 255, 255))
-        window.blit(text, (w // 2 - 150, h // 2))
+gameIsOver = False
+
+
+def gameOver(x, y):
+    x = 1000
+    y = 1000
+    text = gameOverFont.render("GAME OVER", True, (255, 255, 255))
+    window.blit(text, (w // 2 - 150, h // 2))
+    text2 = restartFont.render(
+        "Press 'r' to restart or 'q' to quit.", True, (255, 255, 255)
+    )
+    window.blit(text2, (w // 2 - 175, h // 2 + 50))
 
 
 # Game Loop
@@ -87,6 +87,11 @@ while running:
                 racket2MoveUp(racket2X, racket2Y)
             if event.key == py.K_DOWN:
                 pass
+            if gameIsOver == True and event.key == py.K_r:
+                ballX = w // 2
+                ballY = h // 2
+            if gameIsOver == True and event.key == py.K_q:
+                running = False
 
     window.fill((0, 0, 0))
     draw_ball(ballX, ballY)
@@ -95,5 +100,8 @@ while running:
     ballAnimation(ballX, ballY)
     ballX += ballXSpeed
     ballY += ballYSpeed
+    if ballX <= 0 or ballX >= w or ballY <= 0 or ballY >= h:
+        gameOver(ballX, ballY)
+        gameIsOver = True
     # time.sleep(0.5)
     py.display.update()
