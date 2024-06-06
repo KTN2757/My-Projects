@@ -112,18 +112,18 @@ class Game:
         self.score = 0
 
     def display_score(self):
-        """Displays the score"""
+        """Displays the score."""
         score_font = pygame.font.Font("freesansbold.ttf", 32)
         score_text = score_font.render(f"Score: {self.score}", True, (255, 255, 255))
         self.window.blit(score_text, (32, 32))
 
     def update_score(self, score):
-        """Updates the score"""
+        """Updates the score."""
         self.score += score
         self.display_score()
 
     def reset_score(self):
-        """Resets the score"""
+        """Resets the score."""
         self.score = 0
         self.display_score()
 
@@ -133,7 +133,7 @@ class Game:
         return distance < 31
 
     def food_collision(self):
-        """Calling collision and growing snake"""
+        """Calling collision and growing snake."""
         food_collision = self.is_collision(
             self.snake.x[0], self.snake.y[0], self.food.x, self.food.y
         )
@@ -153,6 +153,14 @@ class Game:
             self.is_game_over = self.game_over()
         elif self.snake.y[0] >= (h - self.snake.h):
             self.is_game_over = self.game_over()
+
+    def self_collision(self):
+        """Checks if the snake collides with itself."""
+        for i in range(1, self.snake.length):
+            if self.is_collision(
+                self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]
+            ):
+                self.is_game_over = self.game_over()
 
     def restart(self):
         """Restarts the game."""
