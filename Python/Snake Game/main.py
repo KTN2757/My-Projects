@@ -1,5 +1,6 @@
 """Requirements."""
 
+import dataclasses
 import math
 import random
 import time
@@ -10,73 +11,88 @@ w, h = 800, 600
 
 
 # Snake
+@dataclasses.dataclass
+class SnakeMovement:
+    """Snake movement dataclass cuz pylint keeps saying "too-many-instance-attributes."""
+
+    x: list
+    y: list
+    direction: str
+    x_change: int
+    y_change: int
+
+
 class Snake:
     """Snake class."""
 
     def __init__(self, parent_window, length):
         self.parent_window = parent_window
         self.color = (0, 255, 0)
-        self.x_change = 32
-        self.y_change = 0
         self.w = 32
         self.h = 32
         self.length = length
-        self.x = [(400 // self.w) * self.w] * self.length
-        self.y = [(300 // self.h) * self.h] * self.length
-        self.direction = "right"
+        self.movement = SnakeMovement(
+            x=[(400 // self.w) * self.w] * self.length,
+            y=[(300 // self.h) * self.h] * self.length,
+            direction="right",
+            x_change=32,
+            y_change=0,
+        )
 
     def increase_length(self):
         """Increases the length of the snake."""
         self.length += 1
-        self.x.append(-1)
-        self.y.append(-1)
+        self.movement.x.append(-1)
+        self.movement.y.append(-1)
 
     def draw(self):
         """Draws a snake."""
         for i in range(self.length):
             pygame.draw.rect(
-                self.parent_window, self.color, (self.x[i], self.y[i], self.w, self.h)
+                self.parent_window,
+                self.color,
+                (self.movement.x[i], self.movement.y[i], self.w, self.h),
             )
 
     def move_left(self):
         """Moves the snake left"""
-        if self.direction != "right":
-            self.direction = "left"
+        if self.movement.direction != "right":
+            self.movement.direction = "left"
 
     def move_right(self):
         """Moves the snake right"""
-        if self.direction != "left":
-            self.direction = "right"
+        if self.movement.direction != "left":
+            self.movement.direction = "right"
 
     def move_up(self):
         """Moves the snake up"""
-        if self.direction != "down":
-            self.direction = "up"
+        if self.movement.direction != "down":
+            self.movement.direction = "up"
 
     def move_down(self):
         """Moves the snake down"""
-        if self.direction != "up":
-            self.direction = "down"
+        if self.movement.direction != "up":
+            self.movement.direction = "down"
 
     def move(self):
         """Moves the snake"""
         for i in range(self.length - 1, 0, -1):
-            self.x[i] = self.x[i - 1]
-            self.y[i] = self.y[i - 1]
-        self.x[0] += self.x_change
-        self.y[0] += self.y_change
-        if self.direction == "up":
-            self.x_change = 0
-            self.y_change = -32
-        if self.direction == "down":
-            self.x_change = 0
-            self.y_change = 32
-        if self.direction == "left":
-            self.x_change = -32
-            self.y_change = 0
-        if self.direction == "right":
-            self.x_change = 32
-            self.y_change = 0
+            self.movement.x[i] = self.movement.x[i - 1]
+            self.movement.y[i] = self.movement.y[i - 1]
+        self.movement.x[0] += self.movement.x_change
+        self.movement.y[0] += self.movement.y_change
+        if self.movement.direction == "up":
+            self.movement.x_change = 0
+            self.movement.y_change = -32
+        if self.movement.direction == "down":
+            self.movement.x_change = 0
+            self.movement.y_change = 32
+        if self.movement.direction == "left":
+            self.movement.x_change = -32
+            self.movement.y_change = 0
+        if self.movement.direction == "right":
+            self.movement.x_change = 32
+            self.movement.y_change = 0
 
 
 # Food
@@ -135,7 +151,7 @@ class Game:
     def food_collision(self):
         """Calling collision and growing snake."""
         food_collision = self.is_collision(
-            self.snake.x[0], self.snake.y[0], self.food.x, self.food.y
+            self.snake.movement.x[0], self.snake.movement.y[0], self.food.x, self.food.y
         )
         if food_collision:
             self.update_score(1)
@@ -145,20 +161,23 @@ class Game:
 
     def border_collision(self):
         """Checks border collision."""
-        if self.snake.x[0] <= 0:
+        if self.snake.movement.x[0] <= 0:
             self.is_game_over = self.game_over()
-        elif self.snake.x[0] >= (w - self.snake.w):
+        elif self.snake.movement.x[0] >= (w - self.snake.w):
             self.is_game_over = self.game_over()
-        if self.snake.y[0] <= 0:
+        if self.snake.movement.y[0] <= 0:
             self.is_game_over = self.game_over()
-        elif self.snake.y[0] >= (h - self.snake.h):
+        elif self.snake.movement.y[0] >= (h - self.snake.h):
             self.is_game_over = self.game_over()
 
     def self_collision(self):
         """Checks if the snake collides with itself."""
         for i in range(1, self.snake.length):
             if self.is_collision(
-                self.snake.x[0], self.snake.y[0], self.snake.x[i], self.snake.y[i]
+                self.snake.movement.x[0],
+                self.snake.movement.y[0],
+                self.snake.movement.x[i],
+                self.snake.movement.y[i],
             ):
                 self.is_game_over = self.game_over()
 
@@ -167,9 +186,13 @@ class Game:
         self.is_game_over = False
         self.reset_score()
         self.snake.length = self.default_snake_length
-        self.snake.direction = "right"
-        self.snake.x = [(400 // self.snake.w) * self.snake.w] * self.snake.length
-        self.snake.y = [(300 // self.snake.h) * self.snake.h] * self.snake.length
+        self.snake.movement.direction = "right"
+        self.snake.movement.x = [
+            (400 // self.snake.w) * self.snake.w
+        ] * self.snake.length
+        self.snake.movement.y = [
+            (300 // self.snake.h) * self.snake.h
+        ] * self.snake.length
         self.food.x = ((random.randint(32, w - 32)) // 32) * 32
         self.food.y = ((random.randint(32, h - 32)) // 32) * 32
         self.snake.draw()
@@ -177,7 +200,7 @@ class Game:
     def game_over(self):
         """Displays \"GAME OVER\"."""
         for i in range(self.snake.length):
-            self.snake.x[i], self.snake.y[i] = 1000, 1000
+            self.snake.movement.x[i], self.snake.movement.y[i] = 1000, 1000
         game_over_font = pygame.font.Font("freesansbold.ttf", 64)
         restart_font = pygame.font.Font("freesansbold.ttf", 16)
         game_over_text = game_over_font.render("GAME OVER", True, (255, 255, 255))
@@ -230,6 +253,7 @@ class Game:
             # Check collisions
             self.food_collision()
             self.border_collision()
+            self.self_collision()
 
             pygame.display.update()
         pygame.quit()
