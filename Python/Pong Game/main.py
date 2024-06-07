@@ -1,8 +1,7 @@
 # Importing Libraries
 """Requirements"""
 
-import math
-import time
+import random
 import pygame as py
 
 # Window
@@ -12,10 +11,11 @@ w, h = 800, 608
 class Racket:
     """Racket class."""
 
-    def __init__(self, parent_window, x1, y1, width, height, ball):
+    def __init__(self, parent_window, x, y, width, height, ball):
         self.parent_window = parent_window
-        self.x1 = x1
-        self.y1 = y1
+        self.x = x
+        self.y = y
+        self.y_speed = 0.7
         self.width = width
         self.height = height
         self.color = (255, 255, 255)
@@ -24,25 +24,27 @@ class Racket:
     def draw(self):
         """Draws a racket."""
         py.draw.rect(
-            self.parent_window, self.color, (self.x1, self.y1, self.width, self.height)
+            self.parent_window, self.color, (self.x, self.y, self.width, self.height)
         )
 
-    def move_up(self):
+    def move_up(self, y_speed):
         """Moves the racket up."""
-        if self.y1 > 0:
-            self.y1 -= 0.5
+        if self.y > 0:
+            self.y -= y_speed
 
-    def move_down(self):
+    def move_down(self, y_speed):
         """Moves the racket down."""
-        if self.y1 < h - self.height:
-            self.y1 += 0.5
+        if self.y < h - self.height:
+            self.y += y_speed
 
     def computer_movement(self):
         """Moves the computer racket."""
-        if self.y1 < self.ball.y:
-            self.move_up()
-        elif self.y1 > self.ball.y:
-            self.move_down()
+        computer_y_speed = 0.7
+        if self.ball.x < w // 2:
+            if self.y < self.ball.y:
+                self.move_down(computer_y_speed)
+            elif self.y > self.ball.y:
+                self.move_up(computer_y_speed)
 
 
 class Ball:
@@ -50,11 +52,12 @@ class Ball:
 
     def __init__(self, parent_window):
         self.parent_window = parent_window
-        self.x = w // 2
-        self.y = h // 2
+        self.x = random.randint(w // 2 - 32, w // 2 + 32)
+        self.y = random.randint(h // 2 - 32, h // 2 + 32)
         self.color = (255, 255, 255)
-        self.x_speed = 0.3
-        self.y_speed = 0.3
+        self.x_speed = 0.5
+        self.y_speed = 0.5
+        print(self.x, self.y)
 
     def draw(self):
         """Draws the ball."""
@@ -94,32 +97,39 @@ class Game:
         """Checks for border collision."""
         if self.ball.y < 0 or self.ball.y > h:
             self.ball.y_speed *= -1
+            self.ball.x_speed += self.ball.x_speed / 4
         if self.ball.x < 0 or self.ball.x > w:
             self.is_game_over = self.game_over()
 
     def racket_collision(self):
         """Checks for racket collision."""
         if (
-            self.ball.x < self.racket1.x1 + self.racket1.width
-            and self.ball.y > self.racket1.y1
-            and self.ball.y < self.racket1.y1 + self.racket1.height
+            self.ball.x < self.racket1.x + self.racket1.width
+            and self.ball.y > self.racket1.y
+            and self.ball.y < self.racket1.y + self.racket1.height
         ):
             self.ball.x_speed *= -1
         if (
-            self.ball.x > self.racket2.x1
-            and self.ball.y > self.racket2.y1
-            and self.ball.y < self.racket2.y1 + self.racket2.height
+            self.ball.x > self.racket2.x
+            and self.ball.y > self.racket2.y
+            and self.ball.y < self.racket2.y + self.racket2.height
         ):
             self.ball.x_speed *= -1
+
+    def show_score(self):
+        """Shows the score."""
+
+    def update_score(self):
+        """Updates the score."""
 
     def restart(self):
         """Restarts the game."""
         self.ball.x, self.ball.y = w // 2, h // 2
-        self.ball.x_speed, self.ball.y_speed = 0.3, 0.3
-        self.racket1.x1, self.racket1.y1 = 5, 288
-        self.racket1.width, self.racket1.height = 10, 50
-        self.racket2.x1, self.racket2.y1 = 785, 288
-        self.racket2.width, self.racket2.height = 10, 50
+        self.ball.x_speed, self.ball.y_speed = 0.5, 0.5
+        self.racket1.x, self.racket1.y = 5, 288
+        self.racket1.width, self.racket1.height = 10, 75
+        self.racket2.x, self.racket2.y = 785, 288
+        self.racket2.width, self.racket2.height = 10, 75
         self.is_game_over = False
 
     def game_over(self):
@@ -127,7 +137,7 @@ class Game:
         self.is_game_over = True
         self.ball.x = 1000
         self.ball.x_speed, self.ball.y_speed = 0, 0
-        self.racket1.x1, self.racket2.x1 = -500, -500
+        self.racket1.x, self.racket2.x = -500, -500
         game_over_font = py.font.SysFont("Comic Sans MS.ttf", 64)
         restart_font = py.font.SysFont("Comic Sans MS.ttf", 32)
         game_over_text = game_over_font.render("GAME OVER", True, (255, 255, 255))
@@ -159,9 +169,9 @@ class Game:
             # Racket Control
             keys = py.key.get_pressed()
             if keys[py.K_UP]:
-                self.racket2.move_up()
+                self.racket2.move_up(self.racket2.y_speed)
             if keys[py.K_DOWN]:
-                self.racket2.move_down()
+                self.racket2.move_down(self.racket2.y_speed)
 
             # Drawing & Movement
             self.ball.draw()
