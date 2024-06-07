@@ -2,6 +2,7 @@
 """Requirements"""
 
 import math
+import time
 import pygame as py
 
 # Window
@@ -11,18 +12,19 @@ w, h = 800, 608
 class Racket:
     """Racket class."""
 
-    def __init__(self, parent_window, x1, y1, x2, y2):
+    def __init__(self, parent_window, x1, y1, width, height, ball):
         self.parent_window = parent_window
         self.x1 = x1
         self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+        self.width = width
+        self.height = height
         self.color = (255, 255, 255)
+        self.ball = ball
 
     def draw(self):
         """Draws a racket."""
         py.draw.rect(
-            self.parent_window, self.color, (self.x1, self.y1, self.x2, self.y2)
+            self.parent_window, self.color, (self.x1, self.y1, self.width, self.height)
         )
 
     def move_up(self):
@@ -32,8 +34,15 @@ class Racket:
 
     def move_down(self):
         """Moves the racket down."""
-        if self.y1 < h - self.y2:
+        if self.y1 < h - self.height:
             self.y1 += 0.5
+
+    def computer_movement(self):
+        """Moves the computer racket."""
+        if self.y1 < self.ball.y:
+            self.move_up()
+        elif self.y1 > self.ball.y:
+            self.move_down()
 
 
 class Ball:
@@ -65,19 +74,20 @@ class Game:
         self.window = py.display.set_mode((w, h))
         py.display.set_caption("Pong Game")
         self.is_game_over = False
+        self.ball = Ball(self.window)
 
         racket1_x1, racket1_y1 = 5, 288
-        racket1_x2, racket1_y2 = 10, 50
+        racket1_w, racket1_h = 10, 75
 
         racket2_x1, racket2_y1 = 785, 288
-        racket2_x2, racket2_y2 = 10, 50
+        racket2_w, racket2_h = 10, 75
+
         self.racket1 = Racket(
-            self.window, racket1_x1, racket1_y1, racket1_x2, racket1_y2
+            self.window, racket1_x1, racket1_y1, racket1_w, racket1_h, self.ball
         )
         self.racket2 = Racket(
-            self.window, racket2_x1, racket2_y1, racket2_x2, racket2_y2
+            self.window, racket2_x1, racket2_y1, racket2_w, racket2_h, self.ball
         )
-        self.ball = Ball(self.window)
 
     # Collisions
     def border_collision(self):
@@ -89,10 +99,17 @@ class Game:
 
     def racket_collision(self):
         """Checks for racket collision."""
-        dist = math.sqrt(
-            (self.ball.x - self.racket2.x1) ** 2 + (self.ball.y - self.racket2.y1) ** 2
-        )
-        if dist <= 10:
+        if (
+            self.ball.x < self.racket1.x1 + self.racket1.width
+            and self.ball.y > self.racket1.y1
+            and self.ball.y < self.racket1.y1 + self.racket1.height
+        ):
+            self.ball.x_speed *= -1
+        if (
+            self.ball.x > self.racket2.x1
+            and self.ball.y > self.racket2.y1
+            and self.ball.y < self.racket2.y1 + self.racket2.height
+        ):
             self.ball.x_speed *= -1
 
     def restart(self):
@@ -100,9 +117,9 @@ class Game:
         self.ball.x, self.ball.y = w // 2, h // 2
         self.ball.x_speed, self.ball.y_speed = 0.3, 0.3
         self.racket1.x1, self.racket1.y1 = 5, 288
-        self.racket1.x2, self.racket1.y2 = 10, 50
+        self.racket1.width, self.racket1.height = 10, 50
         self.racket2.x1, self.racket2.y1 = 785, 288
-        self.racket2.x2, self.racket2.y2 = 10, 50
+        self.racket2.width, self.racket2.height = 10, 50
         self.is_game_over = False
 
     def game_over(self):
@@ -146,11 +163,12 @@ class Game:
             if keys[py.K_DOWN]:
                 self.racket2.move_down()
 
-            # Movement
+            # Drawing & Movement
             self.ball.draw()
             self.ball.move()
             self.racket1.draw()
             self.racket2.draw()
+            self.racket1.computer_movement()
 
             # Check Collision & Boundary
             self.border_collision()
