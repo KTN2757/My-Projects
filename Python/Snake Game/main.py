@@ -7,13 +7,13 @@ import time
 import pygame
 
 # Window size constants
-w, h = 800, 600
+w, h = 800, 608
 
 
 # Snake
 @dataclasses.dataclass
 class SnakeMovement:
-    """Snake movement dataclass cuz pylint keeps saying "too-many-instance-attributes."""
+    """Snake movement dataclass cuz pylint keeps saying \"too-many-instance-attributes.\" """
 
     x: list
     y: list
@@ -117,10 +117,11 @@ class Game:
     def __init__(self):
         pygame.init()
         self.window = pygame.display.set_mode((w, h))
-        logo = pygame.image.load("snake.png")
+        self.background_img = pygame.image.load("Grid 32x32.png")
+        logo = pygame.image.load("logo.png")
         pygame.display.set_icon(logo)
         pygame.display.set_caption("Snake Game by KTN.")
-        self.default_snake_length = 2
+        self.default_snake_length = 3
         self.snake = Snake(self.window, self.default_snake_length)
         self.snake.draw()
         self.food = Food(self.window)
@@ -130,8 +131,8 @@ class Game:
     def display_score(self):
         """Displays the score."""
         score_font = pygame.font.Font("freesansbold.ttf", 32)
-        score_text = score_font.render(f"Score: {self.score}", True, (255, 255, 255))
-        self.window.blit(score_text, (32, 32))
+        score_text = score_font.render(f"Score: {self.score}", True, (255, 255, 0))
+        self.window.blit(score_text, (0, 0))
 
     def update_score(self, score):
         """Updates the score."""
@@ -203,11 +204,11 @@ class Game:
             self.snake.movement.x[i], self.snake.movement.y[i] = 1000, 1000
         game_over_font = pygame.font.Font("freesansbold.ttf", 64)
         restart_font = pygame.font.Font("freesansbold.ttf", 16)
-        game_over_text = game_over_font.render("GAME OVER", True, (255, 255, 255))
+        game_over_text = game_over_font.render("GAME OVER", True, (255, 0, 0))
         restart_text = restart_font.render(
             "Press 'r' to restart the game or 'q' to quit the game.",
             True,
-            (255, 255, 255),
+            (0, 255, 0),
         )
         self.window.blit(game_over_text, (200, 250))
         self.window.blit(restart_text, (200, 350))
@@ -243,12 +244,13 @@ class Game:
             # Color
             self.window.fill((0, 0, 0))
 
-            # Score
-            self.display_score()
-
             # Calling Snake and Food
             self.food.spawn()
             self.snake.draw()
+            self.window.blit(self.background_img, (0, 0))
+
+            # Score
+            self.display_score()
 
             # Check collisions
             self.food_collision()
