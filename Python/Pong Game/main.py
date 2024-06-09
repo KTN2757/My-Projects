@@ -29,12 +29,12 @@ class Racket:
 
     def move_up(self, y_speed):
         """Moves the racket up."""
-        if self.y > 0:
+        if self.y >= 0:
             self.y -= y_speed
 
     def move_down(self, y_speed):
         """Moves the racket down."""
-        if self.y < h - self.height:
+        if self.y <= h - self.height:
             self.y += y_speed
 
     def computer_movement(self):
@@ -76,7 +76,6 @@ class Game:
         py.init()
         self.window = py.display.set_mode((w, h))
         py.display.set_caption("Pong Game")
-        self.is_game_over = False
         self.ball = Ball(self.window)
 
         racket1_x1, racket1_y1 = 5, 288
@@ -91,6 +90,8 @@ class Game:
         self.racket2 = Racket(
             self.window, racket2_x1, racket2_y1, racket2_w, racket2_h, self.ball
         )
+        self.score_r1 = 0
+        self.score_r2 = 0
 
     # Collisions
     def border_collision(self):
@@ -98,8 +99,14 @@ class Game:
         if self.ball.y < 0 or self.ball.y > h:
             self.ball.y_speed *= -1
             self.ball.x_speed += self.ball.x_speed / 4
-        if self.ball.x < 0 or self.ball.x > w:
-            self.is_game_over = self.game_over()
+            return False
+        if self.ball.x < 0:
+            self.restart()
+            return True
+        if self.ball.x > w:
+            self.restart()
+            return True
+        return False
 
     def racket_collision(self):
         """Checks for racket collision."""
@@ -118,23 +125,33 @@ class Game:
 
     def show_score(self):
         """Shows the score."""
+        score_font = py.font.Font("freesansbold.ttf", 32)
+        score_r1_text = score_font.render(f"{self.score_r1}", True, (255, 255, 255))
+        score_r2_text = score_font.render(f"{self.score_r2}", True, (255, 255, 255))
+        self.window.blit(score_r1_text, (32, 32))
+        self.window.blit(score_r2_text, (w - 48, 32))
 
     def update_score(self):
         """Updates the score."""
+        is_border_collision = self.border_collision()
+        if self.ball.x > w // 2 and is_border_collision:
+            self.score_r1 += 1
+        if self.ball.x < w // 2 and is_border_collision:
+            self.score_r2 += 1
 
     def restart(self):
         """Restarts the game."""
+        print("foo")
         self.ball.x, self.ball.y = w // 2, h // 2
         self.ball.x_speed, self.ball.y_speed = 0.5, 0.5
         self.racket1.x, self.racket1.y = 5, 288
         self.racket1.width, self.racket1.height = 10, 75
         self.racket2.x, self.racket2.y = 785, 288
         self.racket2.width, self.racket2.height = 10, 75
-        self.is_game_over = False
+        self.update_score()
 
     def game_over(self):
         """Displays \"GAME OVER\"."""
-        self.is_game_over = True
         self.ball.x = 1000
         self.ball.x_speed, self.ball.y_speed = 0, 0
         self.racket1.x, self.racket2.x = -500, -500
@@ -156,21 +173,14 @@ class Game:
             for event in py.event.get():
                 if event.type == py.QUIT:
                     running = False
-                if event.type == py.KEYDOWN:
-                    if self.is_game_over:
-                        if event.key == py.K_r:
-                            self.restart()
-                        if event.key == py.K_q:
-                            running = False
 
             # Color
             self.window.fill((0, 0, 0))
 
             # Racket Control
-            keys = py.key.get_pressed()
-            if keys[py.K_UP]:
+            if py.key.get_pressed()[py.K_UP]:
                 self.racket2.move_up(self.racket2.y_speed)
-            if keys[py.K_DOWN]:
+            if py.key.get_pressed()[py.K_DOWN]:
                 self.racket2.move_down(self.racket2.y_speed)
 
             # Drawing & Movement
@@ -179,6 +189,10 @@ class Game:
             self.racket1.draw()
             self.racket2.draw()
             self.racket1.computer_movement()
+
+            # Score
+            self.show_score()
+            self.update_score()
 
             # Check Collision & Boundary
             self.border_collision()
