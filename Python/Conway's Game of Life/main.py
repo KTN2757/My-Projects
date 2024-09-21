@@ -6,10 +6,12 @@
 
 import random
 import time
-
 import pygame as py
 
+import Input_box
+
 w, h = 800, 608
+cells = []
 
 
 class Cell:
@@ -20,11 +22,12 @@ class Cell:
         self.x, self.y = x, y
         self.w, self.h = 32, 32
         self.color = (255, 255, 255)
-        print(x, y)
+        cells.append((x, y))
 
     def draw(self):
         """Draws the cell."""
-        py.draw.rect(self.parent_window, (self.color), (self.x, self.y, self.w, self.h))
+        py.draw.rect(self.parent_window, (self.color),
+                     (self.x, self.y, self.w, self.h))
 
     def check_neighbours(self):
         """Checks the neighbours of the cell."""
@@ -47,10 +50,6 @@ class Cell:
                         255,
                     ):
                         neighbours.append((self.x + i * 32, self.y + j * 32))
-        # Any live cell with fewer than two live neighbours dies (referred to as underpopulation).
-        # Any live cell with more than three live neighbours dies (referred to as overpopulation).
-        # Any live cell with two or three live neighbours lives, unchanged, to the next generation.
-        # Any dead cell with exactly three live neighbours comes to life.
         if len(neighbours) < 2:
             self.color = (128, 128, 128)
         if len(neighbours) > 3:
@@ -67,13 +66,7 @@ class Game:
         py.init()
         self.window = py.display.set_mode((w, h))
         self.clock = py.time.Clock()
-        x, y = (
-            random.randint(0, w - 32) // 32 * 32,
-            random.randint(0, h - 32) // 32 * 32,
-        )
-        self.cell = Cell(self.window, x, y)
-        self.cell2 = Cell(self.window, x + 32, y)
-        self.cell3 = Cell(self.window, x, y + 32)
+        self.window.fill((128, 128, 128))
 
     def draw_grid(self):
         """Draws grid."""
@@ -81,6 +74,10 @@ class Game:
         for x in range(0, w, size):
             for y in range(0, h, size):
                 py.draw.rect(self.window, (0, 0, 0), (x, y, size, size), 1)
+
+    def add_cell(self, x, y):
+        """Adds a new cell."""
+        return Cell(self.window, x, y)
 
     def run(self):
         """Runs the game."""
@@ -91,13 +88,17 @@ class Game:
                 if event.type == py.QUIT:
                     running = False
 
-            self.window.fill((128, 128, 128))
-            self.cell.draw()
-            self.cell2.draw()
-            self.cell3.draw()
-            print(self.cell.check_neighbours())
-            print(self.cell2.check_neighbours())
-            print(self.cell3.check_neighbours())
+                if event.type == py.KEYDOWN:
+                    if event.key == py.K_UP:
+                        Input_box.run()
+                        cell = self.add_cell(
+                            random.randint(0, w - 32) // 32 * 32,
+                            random.randint(0, h - 32) // 32 * 32,
+                        )
+                        cell.draw()
+                        print(cells)
+
+            # print(self.cell.check_neighbours())
             self.draw_grid()
 
             py.display.update()
