@@ -26,8 +26,7 @@ class Cell:
 
     def draw(self):
         """Draws the cell."""
-        py.draw.rect(self.parent_window, (self.color),
-                     (self.x, self.y, self.w, self.h))
+        py.draw.rect(self.parent_window, (self.color), (self.x, self.y, self.w, self.h))
 
     def check_neighbours(self):
         """Checks the neighbours of the cell."""
@@ -66,11 +65,11 @@ class Game:
         py.init()
         self.window = py.display.set_mode((w, h))
         self.clock = py.time.Clock()
-        self.window.fill((128, 128, 128))
 
     def draw_grid(self):
         """Draws grid."""
         size = 32
+        self.window.fill((128, 128, 128))
         for x in range(0, w, size):
             for y in range(0, h, size):
                 py.draw.rect(self.window, (0, 0, 0), (x, y, size, size), 1)
@@ -82,6 +81,8 @@ class Game:
     def run(self):
         """Runs the game."""
         running = True
+        if running:
+            self.draw_grid()
         while running:
             self.clock.tick(60)
             for event in py.event.get():
@@ -91,6 +92,7 @@ class Game:
                 if event.type == py.KEYDOWN:
                     if event.key == py.K_UP:
                         Input_box.run()
+                        # self.draw_grid()
                         cell = self.add_cell(
                             random.randint(0, w - 32) // 32 * 32,
                             random.randint(0, h - 32) // 32 * 32,
@@ -99,8 +101,6 @@ class Game:
                         print(cells)
 
             # print(self.cell.check_neighbours())
-            self.draw_grid()
-
             py.display.update()
         py.quit()
 

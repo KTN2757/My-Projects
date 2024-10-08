@@ -5,6 +5,7 @@ import pygame as py
 
 py.init()
 screen = py.display.set_mode((640, 480))
+screen.fill((128, 128, 128))
 COLOR_INACTIVE = py.Color("lightskyblue3")
 COLOR_ACTIVE = py.Color("dodgerblue2")
 FONT = py.font.Font(None, 32)
@@ -60,12 +61,12 @@ def run():
 
     while not done:
         for event in py.event.get():
+            input_box.handle_event(event)
+            input_box.update()
+
             if event.type == py.KEYDOWN:
                 if event.key == py.K_DOWN:
                     done = True
-            input_box.handle_event(event)
-
-            input_box.update()
 
         input_box.draw(screen)
 
