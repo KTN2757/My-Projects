@@ -26,7 +26,8 @@ class Cell:
 
     def draw(self):
         """Draws the cell."""
-        py.draw.rect(self.parent_window, (self.color), (self.x, self.y, self.w, self.h))
+        py.draw.rect(self.parent_window, (self.color),
+                     (self.x, self.y, self.w, self.h))
 
     def check_neighbours(self):
         """Checks the neighbours of the cell."""
@@ -51,6 +52,7 @@ class Cell:
                         neighbours.append((self.x + i * 32, self.y + j * 32))
         if len(neighbours) < 2:
             self.color = (128, 128, 128)
+            self.window.blit()
         if len(neighbours) > 3:
             self.color = (128, 128, 128)
         if len(neighbours) == 3:
@@ -100,7 +102,7 @@ class Game:
                         cell.draw()
                         print(cells)
 
-            # print(self.cell.check_neighbours())
+            print(self.cell.check_neighbours())
             py.display.update()
         py.quit()
 
