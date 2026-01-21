@@ -1,7 +1,7 @@
 # Importing Libraries
 """Requirements"""
 
-import random
+import random as rd
 import pygame as py
 
 # Window
@@ -15,7 +15,7 @@ class Racket:
         self.parent_window = parent_window
         self.x = x
         self.y = y
-        self.y_speed = 0.7
+        self.y_speed = 0.8
         self.width = width
         self.height = height
         self.color = (255, 255, 255)
@@ -39,7 +39,7 @@ class Racket:
 
     def computer_movement(self):
         """Moves the computer racket."""
-        computer_y_speed = 0.7
+        computer_y_speed = 0.5
         if self.ball.x < w // 2:
             if self.y < self.ball.y:
                 self.move_down(computer_y_speed)
@@ -55,10 +55,8 @@ class Ball:
         self.x = w // 2
         self.y = h // 2
         self.color = (255, 255, 255)
-
-        # TODO
-        self.x_speed = 0.5
-        self.y_speed = 0.1
+        self.x_speed = rd.choice([0.4, 0.5])
+        self.y_speed = rd.choice([0.4, 0.5, 0.6])
 
     def draw(self):
         """Draws the ball."""
@@ -95,22 +93,20 @@ class Game:
         self.wall2 = Racket(self.window, 0, h - 10, w, 10, self.ball)
         self.score_r1 = 0
         self.score_r2 = 0
+        self.is_game_over = False
 
     # Collisions
     def border_collision(self):
         """Checks for border collision."""
-        if self.ball.y < 10:
-            self.ball.y = 10
-            self.ball.y_speed *= -1
-            return False
-        if self.ball.y > h - 10:
-            self.ball.y = h - 10
-            self.ball.y_speed *= -1
-            return False
-        if self.ball.x < 10 or self.ball.x > w - 10:
-            self.restart()
-            return True
-        return False
+        if not self.is_game_over:
+            if self.ball.y < 10:
+                self.ball.y = 10
+                self.ball.y_speed *= -1
+            if self.ball.y > h - 10:
+                self.ball.y = h - 10
+                self.ball.y_speed *= -1
+            if self.ball.x < 10 or self.ball.x > w - 10:
+                self.restart()
 
     def racket_collision(self):
         """Checks for racket collision."""
@@ -137,39 +133,55 @@ class Game:
 
     def update_score(self):
         """Updates the score."""
-        print("GAGAA", self.score_r1)
         if self.ball.x > w // 2:
             self.score_r1 += 1
+            self.updated_score = "r1"
         if self.ball.x < w // 2:
             self.score_r2 += 1
-        self.show_score(self.score_r1, self.score_r2)
+            self.updated_score = "r2"
+        if self.score_r1 == 3:
+            self.game_over("r1")
+        elif self.score_r2 == 3:
+            self.game_over("r2")
+        else:
+            self.show_score(self.score_r1, self.score_r2)
 
-    def restart(self):
+    def restart(self, type="soft"):
         """Restarts the game."""
+        if type == "hard":
+            self.is_game_over = False
+            self.score_r1, self.score_r2 = 0, 0
         self.update_score()
         self.ball.x, self.ball.y = w // 2, h // 2
-        # self.ball.x_speed, self.ball.y_speed = 0.5, 0.5
-        # TODO
-        self.ball.x_speed, self.ball.y_speed = 0.5, 0.1
+        self.ball.x_speed, self.ball.y_speed = (
+            rd.choice([0.4, 0.5]),
+            rd.choice([0.4, 0.5, 0.6]),
+        )
+        if self.updated_score == "r1":
+            self.ball.x_speed *= -1
         self.racket1.x, self.racket1.y = 10, 288
         self.racket1.width, self.racket1.height = 10, 75
         self.racket2.x, self.racket2.y = 780, 288
         self.racket2.width, self.racket2.height = 10, 75
 
-    def game_over(self):
+    def game_over(self, winner):
         """Displays \"GAME OVER\"."""
+        self.window.fill((0, 0, 0))
         self.ball.x = 1000
         self.ball.x_speed, self.ball.y_speed = 0, 0
         self.racket1.x, self.racket2.x = -500, -500
         game_over_font = py.font.SysFont("Comic Sans MS.ttf", 64)
         restart_font = py.font.SysFont("Comic Sans MS.ttf", 32)
-        game_over_text = game_over_font.render("GAME OVER", True, (255, 255, 255))
+        if winner == "r1":
+            game_over_text = game_over_font.render(" YOU LOST!", True, (255, 255, 255))
+        if winner == "r2":
+            game_over_text = game_over_font.render(" YOU WON!", True, (255, 255, 255))
         restart_text = restart_font.render(
             "Press 'r' to restart or 'q' to quit.", True, (255, 255, 255)
         )
         self.window.blit(game_over_text, (w // 2 - 150, 288))
         self.window.blit(restart_text, (w // 2 - 175, 330))
-        return True
+        self.is_game_over = True
 
     def run(self):
         """Runs the game."""
@@ -180,26 +192,33 @@ class Game:
                 if event.type == py.QUIT:
                     running = False
 
-            # Color
-            self.window.fill((0, 0, 0))
+            if not self.is_game_over:
+                # Color
+                self.window.fill((0, 0, 0))
 
-            # Racket Control
-            if py.key.get_pressed()[py.K_UP]:
-                self.racket2.move_up(self.racket2.y_speed)
-            if py.key.get_pressed()[py.K_DOWN]:
-                self.racket2.move_down(self.racket2.y_speed)
+                # Drawing & Movement
+                self.ball.draw()
+                self.ball.move()
+                self.racket1.draw()
+                self.racket2.draw()
+                self.wall1.draw()
+                self.wall2.draw()
+                self.racket1.computer_movement()
 
-            # Drawing & Movement
-            self.ball.draw()
-            self.ball.move()
-            self.racket1.draw()
-            self.racket2.draw()
-            self.wall1.draw()
-            self.wall2.draw()
-            self.racket1.computer_movement()
+                # Score
+                self.show_score(self.score_r1, self.score_r2)
 
-            # Score
-            self.show_score(self.score_r1, self.score_r2)
+                # Racket Control
+                if py.key.get_pressed()[py.K_UP]:
+                    self.racket2.move_up(self.racket2.y_speed)
+                if py.key.get_pressed()[py.K_DOWN]:
+                    self.racket2.move_down(self.racket2.y_speed)
+
+            if self.is_game_over:
+                if py.key.get_pressed()[py.K_r]:
+                    self.restart("hard")
+                if py.key.get_pressed()[py.K_q]:
+                    running = False
 
             # Check Collision & Boundary
             self.border_collision()
