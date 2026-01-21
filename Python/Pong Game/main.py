@@ -52,12 +52,13 @@ class Ball:
 
     def __init__(self, parent_window):
         self.parent_window = parent_window
-        self.x = random.randint(w // 2 - 32, w // 2 + 32)
-        self.y = random.randint(h // 2 - 32, h // 2 + 32)
+        self.x = w // 2
+        self.y = h // 2
         self.color = (255, 255, 255)
+
+        # TODO
         self.x_speed = 0.5
-        self.y_speed = 0.5
-        print(self.x, self.y)
+        self.y_speed = 0.1
 
     def draw(self):
         """Draws the ball."""
@@ -78,10 +79,10 @@ class Game:
         py.display.set_caption("Pong Game")
         self.ball = Ball(self.window)
 
-        racket1_x1, racket1_y1 = 5, 288
+        racket1_x1, racket1_y1 = 10, 288
         racket1_w, racket1_h = 10, 75
 
-        racket2_x1, racket2_y1 = 785, 288
+        racket2_x1, racket2_y1 = 780, 288
         racket2_w, racket2_h = 10, 75
 
         self.racket1 = Racket(
@@ -90,20 +91,23 @@ class Game:
         self.racket2 = Racket(
             self.window, racket2_x1, racket2_y1, racket2_w, racket2_h, self.ball
         )
+        self.wall1 = Racket(self.window, 0, 0, w, 10, self.ball)
+        self.wall2 = Racket(self.window, 0, h - 10, w, 10, self.ball)
         self.score_r1 = 0
         self.score_r2 = 0
 
     # Collisions
     def border_collision(self):
         """Checks for border collision."""
-        if self.ball.y < 0 or self.ball.y > h:
+        if self.ball.y < 10:
+            self.ball.y = 10
             self.ball.y_speed *= -1
-            self.ball.x_speed += self.ball.x_speed / 4
             return False
-        if self.ball.x < 0:
-            self.restart()
-            return True
-        if self.ball.x > w:
+        if self.ball.y > h - 10:
+            self.ball.y = h - 10
+            self.ball.y_speed *= -1
+            return False
+        if self.ball.x < 10 or self.ball.x > w - 10:
             self.restart()
             return True
         return False
@@ -123,32 +127,34 @@ class Game:
         ):
             self.ball.x_speed *= -1
 
-    def show_score(self):
+    def show_score(self, s1, s2):
         """Shows the score."""
         score_font = py.font.Font("freesansbold.ttf", 32)
-        score_r1_text = score_font.render(f"{self.score_r1}", True, (255, 255, 255))
-        score_r2_text = score_font.render(f"{self.score_r2}", True, (255, 255, 255))
+        score_r1_text = score_font.render(f"{s1}", True, (255, 255, 255))
+        score_r2_text = score_font.render(f"{s2}", True, (255, 255, 255))
         self.window.blit(score_r1_text, (32, 32))
         self.window.blit(score_r2_text, (w - 48, 32))
 
     def update_score(self):
         """Updates the score."""
-        is_border_collision = self.border_collision()
-        if self.ball.x > w // 2 and is_border_collision:
+        print("GAGAA", self.score_r1)
+        if self.ball.x > w // 2:
             self.score_r1 += 1
-        if self.ball.x < w // 2 and is_border_collision:
+        if self.ball.x < w // 2:
             self.score_r2 += 1
+        self.show_score(self.score_r1, self.score_r2)
 
     def restart(self):
         """Restarts the game."""
-        print("foo")
-        self.ball.x, self.ball.y = w // 2, h // 2
-        self.ball.x_speed, self.ball.y_speed = 0.5, 0.5
-        self.racket1.x, self.racket1.y = 5, 288
-        self.racket1.width, self.racket1.height = 10, 75
-        self.racket2.x, self.racket2.y = 785, 288
-        self.racket2.width, self.racket2.height = 10, 75
         self.update_score()
+        self.ball.x, self.ball.y = w // 2, h // 2
+        # self.ball.x_speed, self.ball.y_speed = 0.5, 0.5
+        # TODO
+        self.ball.x_speed, self.ball.y_speed = 0.5, 0.1
+        self.racket1.x, self.racket1.y = 10, 288
+        self.racket1.width, self.racket1.height = 10, 75
+        self.racket2.x, self.racket2.y = 780, 288
+        self.racket2.width, self.racket2.height = 10, 75
 
     def game_over(self):
         """Displays \"GAME OVER\"."""
@@ -188,11 +194,12 @@ class Game:
             self.ball.move()
             self.racket1.draw()
             self.racket2.draw()
+            self.wall1.draw()
+            self.wall2.draw()
             self.racket1.computer_movement()
 
             # Score
-            self.show_score()
-            self.update_score()
+            self.show_score(self.score_r1, self.score_r2)
 
             # Check Collision & Boundary
             self.border_collision()
