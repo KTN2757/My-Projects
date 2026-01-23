@@ -19,6 +19,7 @@ class Game:
         self.window = py.display.set_mode((w, h))
         py.display.set_caption("Conway's Game of Life")
         self.clock = py.time.Clock()
+        self.speed = 10
         # How many cells are there x-wise and y-wise
         self.grid_xcount = w // CELL_SIZE
         self.grid_ycount = h // CELL_SIZE
@@ -32,7 +33,7 @@ class Game:
 
     def draw_grid(self):
         """Draws grid."""
-        self.window.fill((128, 128, 128))
+        self.window.fill((40, 40, 40))
         for row in range(self.grid_ycount):
             for col in range(self.grid_xcount):
                 x = col * CELL_SIZE
@@ -47,9 +48,12 @@ class Game:
         font = py.font.Font(None, 24)
         instructions = [
             "SPACE: Play/Pause",
+            "N: Step",
             "R: Randomize",
             "C: Clear",
-            "Click: Toggle cell",
+            "Click: Toggle Cell",
+            "UP: Speed Up",
+            "DOWN: Speed Down",
             "Q: Quit",
         ]
 
@@ -118,7 +122,7 @@ class Game:
         running = True
 
         while running:
-            self.clock.tick(10)
+            self.clock.tick(self.speed)
 
             for event in py.event.get():
                 if event.type == py.QUIT:
@@ -127,14 +131,20 @@ class Game:
                 if event.type == py.KEYDOWN:
                     if event.key == py.K_SPACE:
                         self.paused = not self.paused
+                    elif event.key == py.K_n and self.paused:
+                        self.update_grid()
                     elif event.key == py.K_r:
                         self.randomize_grid()
                     elif event.key == py.K_c:
                         self.clear_grid()
+                    elif event.key == py.K_UP:
+                        self.speed = min(60, self.speed + 2)
+                    elif event.key == py.K_DOWN:
+                        self.speed = max(1, self.speed - 2)
                     elif event.key == py.K_q:
                         running = False
 
-                if event.type == py.MOUSEBUTTONDOWN:
+                if event.type == py.MOUSEBUTTONDOWN and self.paused:
                     self.handle_click(py.mouse.get_pos())
 
             if not self.paused:
