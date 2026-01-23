@@ -69,16 +69,10 @@ class Game:
                 neighbours = self.count_neighbours(row, col)
                 current = self.grid[row][col]
 
-                if current == 1:
-                    if neighbours < 2:
-                        new_grid[row][col] = 0
-                    elif neighbours > 3:
-                        new_grid[row][col] = 0
-                    else:
-                        new_grid[row][col] = 1
-                else:
-                    if neighbours == 3:
-                        new_grid[row][col] = 1
+                if current == 1 and neighbours in (2, 3):
+                    new_grid[row][col] = 1
+                elif current == 0 and neighbours == 3:
+                    new_grid[row][col] = 1
 
         self.grid = new_grid
 
